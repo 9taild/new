@@ -1,0 +1,12 @@
+import cv2 
+image_path = "images/elephant2.jpeg" 
+image = cv2.imread(image_path) 
+cv2.imshow("Original Image", image);
+downsampled_image = cv2.resize(image, (image.shape[1] // 2, image.shape[0] // 2)) 
+cv2.imshow("Downsampled Image", downsampled_image) 
+upsampled_width = int(image.shape[1] * 1.5) 
+upsampled_height = int(image.shape[0] * 1.5) 
+upsampled_image = cv2.resize(image, (upsampled_width, upsampled_height)) 
+cv2.imshow("Upsampled Image", upsampled_image) 
+cv2.waitKey(0) 
+cv2.destroyAllWindows()
