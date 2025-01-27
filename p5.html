@@ -1,0 +1,19 @@
+###################
+#5)linear and nonlinear noise smoothing
+import cv2
+import numpy as np
+
+image = cv2.imread('images/elephant2.jpeg')
+
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+gaussian_smoothed = cv2.GaussianBlur(gray_image, (5, 5), 0)
+
+median_smoothed = cv2.medianBlur(gray_image, 5)
+
+cv2.imshow("Original Image", gray_image)
+cv2.imshow("Gaussian Smoothing - Linear", gaussian_smoothed)
+cv2.imshow("Nonlinear Smoothing (Median)", median_smoothed)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()

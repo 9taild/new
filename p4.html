@@ -1,0 +1,47 @@
+######################
+#4.1 4)Gradient and Laplacian operations
+
+import cv2
+import numpy as np
+
+image = cv2.imread("images/corners.jpg") 
+
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# Calculate gradients in x and y directions
+gradient_x = cv2.Sobel(gray_image, cv2.CV_64F, 1, 0, ksize=3)
+gradient_y = cv2.Sobel(gray_image, cv2.CV_64F, 0, 1, ksize=3)
+
+# Calculate gradient magnitude
+gradient_magnitude = np.sqrt(gradient_x**2 + gradient_y**2)
+gradient_magnitude = cv2.normalize(gradient_magnitude, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U) 
+
+# Calculate gradient direction
+gradient_direction = np.arctan2(gradient_y, gradient_x)
+
+# Display results
+cv2.imshow("Original Image", image)
+cv2.imshow("Gradient Magnitude", gradient_magnitude)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+###################################################
+#4.2) laplacian
+
+import cv2
+import numpy as np
+
+image = cv2.imread("images/chess-board-1.jpg") 
+
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+laplacian = cv2.Laplacian(gray_image, cv2.CV_64F, ksize=3)
+
+laplacian = cv2.convertScaleAbs(laplacian)
+
+cv2.imshow("Original Image", image)
+cv2.imshow("Laplacian Edge Detection", laplacian)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()

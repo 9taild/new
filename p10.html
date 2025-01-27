@@ -1,0 +1,36 @@
+########################################
+#10)segmentation for detecting lines, circles, and other shapes/ objects
+import cv2
+import numpy as np
+
+image = cv2.imread("images/circles.jpg")
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+edges = cv2.Canny(gray_image, 50, 150)
+
+circles = cv2.HoughCircles(gray_image, cv2.HOUGH_GRADIENT, dp=1.5, minDist=150, param1=50, param2=30, minRadius=10, maxRadius=50)
+circle_image = image.copy()
+if circles is not None:
+    circles = np.uint16(np.around(circles))
+    for circle in circles[0, :]:
+        center = (circle[0], circle[1])  
+        radius = circle[2]             
+        cv2.circle(circle_image, center, radius, (0, 0, 255), 2)  
+        cv2.circle(circle_image, center, 2, (255, 0, 0), 3)       
+
+_, binary_image = cv2.threshold(gray_image, 127, 255, cv2.THRESH_BINARY)
+
+num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(binary_image)
+
+regions_image = np.zeros_like(image)
+for i in range(1, num_labels):
+    color = tuple(np.random.randint(0, 255, size=3).tolist())
+    regions_image[labels == i] = color
+
+cv2.imshow("Original Image", image)
+cv2.imshow("Edges (Canny)", edges)
+cv2.imshow("Detected Circles", circle_image)
+cv2.imshow("Region-Based Segmentation", regions_image)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()

@@ -1,0 +1,74 @@
+########################
+#3.1)Log and Power-law transformations
+import cv2
+import numpy as np
+
+image_path = "images/dark.jpg"  
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+image = np.float32(image)#3.0, 255.0
+
+c = 255 / np.log(1 + np.max(image)) 
+log_image = c * np.log(1 + image) 
+
+log_image = cv2.convertScaleAbs(log_image)
+
+cv2.imshow("Original Image", image.astype(np.uint8))# 3, 255
+cv2.imshow("Log Transformed Image", log_image)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+########################################
+
+#3.2)Contrast adjustments
+
+import cv2
+import numpy as np
+
+image_path = "images/bright.jpg" 
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+gamma = 4 
+normalized = image / 255.0
+gamma_corrected = cv2.pow(normalized, gamma)
+gamma_image = cv2.convertScaleAbs(gamma_corrected * 255)
+
+cv2.imshow("Original Image", image)
+cv2.imshow("Gamma Corrected Image", gamma_image)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+###########################################
+
+#3.3)Histogram equalization
+import cv2
+
+image_path = "images/elephant2.jpeg"  
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+hist_eq_image = cv2.equalizeHist(image)
+
+cv2.imshow("Original Image", image)
+cv2.imshow("Histogram Equalized Image", hist_eq_image)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+########################################
+
+#3.4)Thresholding, and halftoning operations
+import cv2
+
+image_path = "images/elephant2.jpeg"  
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+threshold = 125  #0 - 255
+_, binary_image = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)#250 > 128 => 255
+
+cv2.imshow("Original Image", image)
+cv2.imshow("Thresholded Image", binary_image)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
