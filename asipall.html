@@ -1,0 +1,454 @@
+Practical No.1 
+Aim: Write program to demonstrate the following aspects of signal processing on suitable data. 
+1. Upsampling and downsampling on Image/speech signal 
+2. Fast Fourier Transform to compute DFT 
+####
+
+1. Upsampling and downsampling on Image/speech signal 
+
+Code : 
+import cv2 
+image_path = "images/elephant2.jpeg" 
+image = cv2.imread(image_path) 
+cv2.imshow("Original Image", image);
+downsampled_image = cv2.resize(image, (image.shape[1] // 2, image.shape[0] // 2)) 
+cv2.imshow("Downsampled Image", downsampled_image) 
+upsampled_width = int(image.shape[1] * 1.5) 
+upsampled_height = int(image.shape[0] * 1.5) 
+upsampled_image = cv2.resize(image, (upsampled_width, upsampled_height)) 
+cv2.imshow("Upsampled Image", upsampled_image) 
+cv2.waitKey(0) 
+cv2.destroyAllWindows() 
+
+#############
+2.Fast Fourier Transform to compute DFT.
+Code: 
+import numpy as np
+import matplotlib.pyplot as plt
+sampling_rate = 1000 
+duration = 1.0 
+t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False) 
+frequency = 5 
+signal = np.sin(2 * np.pi * frequency * t) + 0.5 * np.random.normal(size=t.shape) 
+fft_result = np.fft.fft(signal)
+frequencies = np.fft.fftfreq(len(signal), d=1/sampling_rate) 
+magnitude = np.abs(fft_result)
+plt.figure(figsize=(12, 6))
+plt.subplot(2, 1, 1)
+plt.title("Original Signal")
+plt.plot(t, signal)
+
+plt.xlabel("Time (s)")
+plt.ylabel("Amplitude")
+plt.grid()
+plt.subplot(2, 1, 2)
+plt.title("FFT (Magnitude)")
+plt.plot(frequencies[:len(frequencies)//2], magnitude[:len(magnitude)//2])
+plt.xlabel("Frequency (Hz)")
+plt.ylabel("Magnitude")
+plt.grid()
+plt.tight_layout()
+plt.show()
+
+
+######################
+Practical No.2 
+Aim: Write program to demonstrate the following aspects of signal on sound/image data
+1. Convolution operation
+2. Template Matching 
+
+Input Code: 
+import cv2 
+import numpy as np 
+image_path = "images/elephant2.jpeg" 
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE) 
+kernel = np.ones((3, 3), np.float32) / 9 
+convolved_image = cv2.filter2D(image, -1, kernel) 
+cv2.imshow("Original Image", image) 
+cv2.imshow("Convolved Image (Smoothing Filter)", convolved_image) 
+cv2.waitKey(0) 
+cv2.destroyAllWindows()
+
+########################
+
+2.Template Matching:
+
+Input Code:
+import cv2
+image_path = "images/elephant2.jpeg" 
+9
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+template_path = "images/elephant_template.jpeg" 
+template = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
+w, h = template.shape[::-1]
+result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
+min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+top_left = max_loc
+bottom_right = (top_left[0] + w, top_left[1] + h)
+matched_image = image.copy()
+cv2.rectangle(matched_image, top_left, bottom_right, 255, 2)
+cv2.imshow("Original Image", image)
+cv2.imshow("Matched Image", matched_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+########################################################
+Practical No.3 
+Aim: Write program to implement point/pixel intensity transformations such as: 
+1. Log and Power-law transformations 
+2. Contrast adjustments 
+3. Histogram equalization 
+4. Thresholding, and halftoning operations. 
+
+1) Log
+
+import cv2 
+import numpy as np 
+image_path = "dark.jpg" 
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE) 
+image = np.float32(image)#3.0, 255.0 
+c = 255 / np.log(1 + np.max(image)) 
+log_image = c * np.log(1 + image) 
+log_image = cv2.convertScaleAbs(log_image) 
+cv2.imshow("Original Image", image.astype(np.uint8))# 3, 255 
+cv2.imshow("Log Transformed Image", log_image) 
+cv2.waitKey(0) 
+cv2.destroyAllWindows() 
+
+################################################
+
+2)
+import cv2
+import numpy as np
+image_path = "bright.jpg" 
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+gamma = 4 
+normalized = image / 255.0
+gamma_corrected = cv2.pow(normalized, gamma)
+gamma_image = cv2.convertScaleAbs(gamma_corrected * 255)
+cv2.imshow("Original Image", image)
+cv2.imshow("Gamma Corrected Image", gamma_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+###############################################
+
+import cv2
+image_path = "images/elephant2.jpeg" 
+
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+hist_eq_image = cv2.equalizeHist(image)
+cv2.imshow("Original Image", image)
+cv2.imshow("Histogram Equalized Image", hist_eq_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+###################################################
+4)
+
+import cv2
+
+image_path = "images/elephant2.jpeg" 
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+threshold = 125 #0 - 255
+_, binary_image = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)#250 > 128 => 255
+cv2.imshow("Original Image", image)
+cv2.imshow("Thresholded Image", binary_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+###################################################
+
+Practical No.4 
+Aim: Write a program to apply various enhancements on images using image derivatives by 
+implementing Gradient and Laplacian operations. 
+1.Gradiant opration
+
+import cv2 
+import numpy as np 
+image = cv2.imread("images/corners.jpg") 
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
+# Calculate gradients in x and y directions 
+gradient_x = cv2.Sobel(gray_image, cv2.CV_64F, 1, 0, ksize=3) 
+gradient_y = cv2.Sobel(gray_image, cv2.CV_64F, 0, 1, ksize=3) 
+# Calculate gradient magnitude 
+gradient_magnitude = np.sqrt(gradient_x**2 + gradient_y**2) 
+gradient_magnitude = cv2.normalize(gradient_magnitude, None, 0, 255, cv2.NORM_MINMAX, 
+cv2.CV_8U) 
+# Calculate gradient direction 
+gradient_direction = np.arctan2(gradient_y, gradient_x) 
+# Display results 
+cv2.imshow("Original Image", image) 
+cv2.imshow("Gradient Magnitude", gradient_magnitude)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#######################
+
+Laplacian operations.
+
+import cv2
+import numpy as np
+image = cv2.imread("images/corners.jpg") 
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+laplacian = cv2.Laplacian(gray_image, cv2.CV_64F, ksize=3)
+
+laplacian = cv2.convertScaleAbs(laplacian)
+cv2.imshow("Original Image", image)
+cv2.imshow("Laplacian Edge Detection", laplacian)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+##########################################################################
+
+
+Practical No. 5
+Aim: Write a program to implement linear and nonlinear noise smoothing on suitable image or sound 
+signal.
+
+import cv2 
+import numpy as np 
+image = cv2.imread('images/elephant2.jpeg') 
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
+gaussian_smoothed = cv2.GaussianBlur(gray_image, (5, 5), 0) 
+median_smoothed = cv2.medianBlur(gray_image, 5) 
+cv2.imshow("Original Image", gray_image) 
+cv2.imshow("Gaussian Smoothing - Linear", gaussian_smoothed) 
+cv2.imshow("Nonlinear Smoothing (Median)", median_smoothed) 
+cv2.waitKey(0) 
+cv2.destroyAllWindows() 
+
+
+##########################################################################
+Practical No. 6 
+Aim: Write a program to apply various image enhancement using image derivatives by implementing 
+smoothing, sharpening, and unsharp masking filters for generating suitable images for specific 
+application requirements. 
+
+import cv2 
+import numpy as np 
+image = cv2.imread("images/elephant2.jpeg") 
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
+smoothed_image = cv2.GaussianBlur(gray_image, (5, 5), 0) 
+sharpening_kernel = np.array([[0, -1, 0], 
+ [-1, 5, -1], 
+ [0, -1, 0]]) 
+sharpened_image = cv2.filter2D(gray_image, -1, sharpening_kernel) 
+blurred_image = cv2.GaussianBlur(gray_image, (5, 5), 0) 
+unsharp_image = cv2.addWeighted(gray_image, 1.5, blurred_image, -0.5, 0) 
+cv2.imshow("Original Image", gray_image) 
+cv2.imshow("Smoothed Image (Gaussian Blur)", smoothed_image) 
+cv2.imshow("Sharpened Image", sharpened_image) 
+cv2.imshow("Unsharp Masking", unsharp_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#########################################################################
+
+Practical No. 7
+Aim : Write a program to Apply edge detection techniques such as Sobel and Canny to extract 
+meaningful information from the given image samples.
+
+## canny
+import cv2
+import numpy as np
+
+image_path = "corners.jpg"
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+# Apply Gaussian Blur (optional but recommended)
+blurred_image = cv2.GaussianBlur(image, (3, 3), 0)
+
+# Calculate gradients
+gradient_x = cv2.Sobel(blurred_image, cv2.CV_64F, 1, 0, ksize=3)
+gradient_y = cv2.Sobel(blurred_image, cv2.CV_64F, 0, 1, ksize=3)
+
+# Calculate gradient magnitude and direction
+gradient_magnitude = np.sqrt(gradient_x**2 + gradient_y**2)
+gradient_magnitude = cv2.normalize(gradient_magnitude, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+gradient_direction = np.arctan2(gradient_y, gradient_x)
+
+# Non-Maximum Suppression
+edges = np.zeros_like(gradient_magnitude)
+for i in range(1, image.shape[0] - 1):
+    for j in range(1, image.shape[1] - 1):
+        angle = gradient_direction[i, j] * 180. / np.pi
+        # Round angle to 0, 45, 90, or 135 degrees
+        angle = int(round(angle / 45.) * 45.) 
+
+        if angle == 0:
+            neighbor1 = gradient_magnitude[i, j - 1]
+            neighbor2 = gradient_magnitude[i, j + 1]
+        elif angle == 45:
+            neighbor1 = gradient_magnitude[i - 1, j - 1]
+            neighbor2 = gradient_magnitude[i + 1, j + 1]
+        elif angle == 90:
+            neighbor1 = gradient_magnitude[i - 1, j]
+            neighbor2 = gradient_magnitude[i + 1, j]
+        elif angle == 135:
+            neighbor1 = gradient_magnitude[i - 1, j + 1]
+            neighbor2 = gradient_magnitude[i + 1, j - 1]
+
+        if gradient_magnitude[i, j] >= neighbor1 and gradient_magnitude[i, j] >= neighbor2:
+            edges[i, j] = gradient_magnitude[i, j]
+
+# Hysteresis Thresholding
+high_threshold = 0.15 * np.max(edges)
+low_threshold = 0.05 * high_threshold
+
+for i in range(1, image.shape[0] - 1):
+    for j in range(1, image.shape[1] - 1):
+        if edges[i, j] >= high_threshold:
+            edges[i, j] = 255
+        elif edges[i, j] <= low_threshold:
+            edges[i, j] = 0
+        else:
+            if ((edges[i+1, j] >= high_threshold) or 
+                (edges[i-1, j] >= high_threshold) or 
+                (edges[i, j+1] >= high_threshold) or 
+                (edges[i, j-1] >= high_threshold) or 
+                (edges[i+1, j+1] >= high_threshold) or 
+                (edges[i-1, j-1] >= high_threshold) or 
+                (edges[i+1, j-1] >= high_threshold) or 
+                (edges[i-1, j+1] >= high_threshold)):
+                edges[i, j] = 255
+
+cv2.imshow("Original Image", image)
+cv2.imshow("Canny Edges", edges)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#############################
+#sobel
+import cv2
+import numpy as np
+
+image_path = "images/chess.png"
+image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+
+SobelX = np.array([[-1, 0, 1], 
+                   [-2, 0, 2], 
+                   [-1, 0, 1]])
+
+SobelY = np.array([[-1, -2, -1], 
+                   [ 0,  0,  0], 
+                   [ 1,  2,  1]])
+
+gradient_x = cv2.filter2D(image, -1, SobelX)
+gradient_y = cv2.filter2D(image, -1, SobelY)
+
+gradient_x = np.float32(gradient_x)
+gradient_y = np.float32(gradient_y)
+
+edges = cv2.magnitude(gradient_x, gradient_y)
+
+cv2.imshow("Original Image", image)
+cv2.imshow("Sobel Edge Detection", edges.astype(np.uint8))
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+##########################################################################
+Practical No. 8 
+Aim: Write the program to implement various morphological image processing techniques. 
+
+
+import cv2 
+import numpy as np 
+inp_img = 'images/erod.jpg' 
+image = cv2.imread(inp_img, 0) 
+invert = cv2.bitwise_not(image) 
+kernel = np.ones((5, 5), np.uint8)#structuring element 
+erosion = cv2.erode(invert, kernel, iterations=1) 
+dilation = cv2.dilate(invert, kernel, iterations=1) 
+opening = cv2.morphologyEx(invert, cv2.MORPH_OPEN, kernel) 
+closing = cv2.morphologyEx(invert, cv2.MORPH_CLOSE, kernel) 
+cv2.imshow('Original Image', image) 
+cv2.imshow('Erosion', erosion) 
+cv2.imshow('Dilation', dilation) 
+cv2.imshow('Opening', opening) 
+cv2.imshow('Closing', closing) 
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+###########################################################################
+
+Practical No. 9
+Aim : Implement feature detectors and descriptors for image analysis.
+
+# 9.1) harries cornar 
+import cv2
+import numpy as np
+
+image_path = "images/chess.png"  
+image = cv2.imread(image_path)
+
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+gray = np.float32(gray)  
+dst = cv2.cornerHarris(gray, 2, 3, 0.04)
+
+dst = cv2.dilate(dst, None)
+
+image[dst > 0.01 * dst.max()] = [0, 0, 255] 
+
+cv2.imshow("Harris Corner Detection", image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+########################
+
+#9.2) face detection 
+import cv2
+
+image_path = "images/faces.jpg"  
+image = cv2.imread(image_path)
+
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+
+for (x, y, w, h) in faces:
+    cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    
+cv2.imshow("Face Detection", image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#####################################################################################################
+
+import cv2
+import numpy as np
+
+image = cv2.imread("images/circles.jpg")
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+edges = cv2.Canny(gray_image, 50, 150)
+
+circles = cv2.HoughCircles(gray_image, cv2.HOUGH_GRADIENT, dp=1.5, minDist=150, param1=50, param2=30, minRadius=10, maxRadius=50)
+circle_image = image.copy()
+if circles is not None:
+    circles = np.uint16(np.around(circles))
+    for circle in circles[0, :]:
+        center = (circle[0], circle[1])  
+        radius = circle[2]             
+        cv2.circle(circle_image, center, radius, (0, 0, 255), 2)  
+        cv2.circle(circle_image, center, 2, (255, 0, 0), 3)       
+
+_, binary_image = cv2.threshold(gray_image, 127, 255, cv2.THRESH_BINARY)
+
+num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(binary_image)
+
+regions_image = np.zeros_like(image)
+for i in range(1, num_labels):
+    color = tuple(np.random.randint(0, 255, size=3).tolist())
+    regions_image[labels == i] = color
+
+cv2.imshow("Original Image", image)
+cv2.imshow("Edges (Canny)", edges)
+cv2.imshow("Detected Circles", circle_image)
+cv2.imshow("Region-Based Segmentation", regions_image)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
